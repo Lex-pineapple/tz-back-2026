@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from app.requests.schemas import NewRequest, RequestsList, RequestData, DataCreated, UpdateStatus, ReqStatusEnum, ReqModelEnum, ReqSortEnum
 from app.core.database import get_db
 from app.requests.utils import apply_filters
+# from app.utils.auth_decorator import AuthDecorator
 
 router = APIRouter(
   prefix="/requests",
@@ -59,6 +60,7 @@ async def update_item(request_id: int, body: UpdateStatus):
 
         return updated
     
+# @AuthDecorator.require_access("requests.delete")
 @router.delete('/{request_id}')
 async def delete_request(request_id: int):
     with get_db() as db:
@@ -67,7 +69,7 @@ async def delete_request(request_id: int):
         row = cursor.fetchone()
 
         if row is None:
-            raise HTTPException(404, detail="User not found")
+            raise HTTPException(404, detail="Request not found")
         if (row["status"] == "done"):
             raise HTTPException(400, detail="Cannot delete request when it has status = done")
         cursor.execute("DELETE FROM test WHERE ?", (request_id,))

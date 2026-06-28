@@ -42,7 +42,7 @@ def auth_user(username: str, password: str):
     return dict(user)
 
 def create_access_token(username: str, user_id: int, expires_delta: timedelta | None = None) -> JWTToken:
-  to_encode: JWTPayload = {"sub": username, "id": user_id}
+  to_encode: JWTPayload = {"sub": username, "id": user_id, "permissions": ["*"]}
   if expires_delta:
     expire = datetime.now(timezone.utc) + expires_delta
   else:

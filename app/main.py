@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from app.core.database import init_db
+from app.middlewares.request_middleware import RequestMiddleware
 from app.requests.router import router as requests_router
 from app.auth.router import router as auth_router
 
@@ -11,6 +12,7 @@ app = FastAPI()
 
 init_db()
 
+app.add_middleware(RequestMiddleware)
 app.include_router(requests_router)
 app.include_router(auth_router)
 
