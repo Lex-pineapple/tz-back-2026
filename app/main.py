@@ -55,3 +55,17 @@ def update_item(request_id: int, body: UpdateStatus):
         updated = dict(cursor.fetchone())
 
         return updated
+    
+@app.delete('/requests/{request_id}')
+def delete_request(request_id: int):
+    with get_db() as db:
+        cursor = db.cursor()
+        cursor.execute("SELECT id, status FROM test WHERE id = ?", (request_id,))
+        row = cursor.fetchone()
+
+        if row is None:
+            raise HTTPException(404, detail="User not found")
+        if (row["status"] == "done"):
+            raise HTTPException(400, detail="Cannot delete request when it has status = done")
+        cursor.execute("DELETE FROM test WHERE ?", (request_id,))
+        return 'success'
