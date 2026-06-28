@@ -1,11 +1,56 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from app.database import get_db, init_db
-from app.models import NewRequest, RequestsList, RequestData, DataCreated, UpdateStatus
+from app.models import NewRequest, RequestsList, RequestData, DataCreated, UpdateStatus, ValidationError, ReqStatusEnum, ReqModelEnum, ReqSortEnum, QueryFilters
 import math
 
 app = FastAPI()
 
 init_db()
+
+def apply_filters(status: ReqStatusEnum | None = None, priority: ReqModelEnum | None = None, sort: ReqSortEnum | None = None, query: str | None = None, page: int = 0) -> QueryFilters:
+    where_query: list[str] = []
+    where_params: list[str] = []
+    if (status):
+        where_query.append("status = ?")
+        where_params.append(status)
+    if (priority):
+        where_query.append("priority = ?")
+        where_params.append(priority)
+    if (query):
+        where_query.append("(title LIKE ? OR description LIKE ?)")
+        where_params.extend([f"%{query}%", f"%{query}%"])
+    
+    where_req = ""
+    if where_query:
+        where_req = "WHERE " + " AND ".join(where_query)
+    
+    sort_fields = {
+        "createdAtAsc":  ["created_at", "ASC"],
+        "createdAtDesc":  ["created_at", "DESC"],
+        "priorityAsc": ["priority", "ASC"],
+        "priorityDesc": ["priority", "DESC"]
+    }
+
+    order_by =  sort_fields['createdAtAsc'] if sort else ["created_at", "ASC"]
+    return {
+        "order_by": order_by[0],
+        "order_dir": order_by[1],
+        "where_req": where_req,
+        "where_params": where_params
+    }
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(_, exc: RequestValidationError):
+    errorData: ValidationError = {"type": "Validation errors","errors": []}
+    for error in exc.errors():
+        errorData['errors'].append({
+            "location": " > ".join(error['loc']),
+            "message": error['msg']
+        })
+    return JSONResponse(content=errorData, status_code=400)
 
 @app.get('/')
 def test_route():
@@ -23,12 +68,15 @@ def create_request(item: NewRequest) -> DataCreated:
     return DataCreated(id=item_id, message="Request created")
 
 @app.get('/requests')
-def get_all_items() -> RequestsList:
+def get_all_items(status: ReqStatusEnum | None = None, priority: ReqModelEnum | None = None, sort: ReqSortEnum | None = None, query: str | None = None, page: int = 0) -> RequestsList:
     with get_db() as db:
+        filters = apply_filters(status, priority, sort, query, page)
         cursor = db.cursor()
-        cursor.execute("SELECT COUNT(*) FROM test")
+        cursor.execute(f"SELECT COUNT(*) FROM test {filters["where_req"]}", (filters["where_params"]))
         pages = cursor.fetchone()[0]
-        cursor.execute("SELECT * FROM test")
+        offset = (page - 1) * 10
+        print('🚀 ~ get_all_items ~ f"SELECT * FROM test {filters["where_req"]} ORDER BY {filters["order_by"]} {filters["order_dir"]} LIMIT ? OFFSET ?":', f"SELECT * FROM test {filters["where_req"]} ORDER BY {filters["order_by"]} {filters["order_dir"]} LIMIT ? OFFSET ?")
+        cursor.execute(f"SELECT * FROM test {filters["where_req"]} ORDER BY {filters["order_by"]} {filters["order_dir"]} LIMIT ? OFFSET ?", filters["where_params"] + [10, offset])
         rows = cursor.fetchall()
     if not rows:
         return {"pages": 0, "items": []}

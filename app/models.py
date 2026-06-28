@@ -13,6 +13,12 @@ class ReqModelEnum(str, Enum):
   normal = 'normal'
   high = 'high'
 
+class ReqSortEnum(str, Enum):
+  createdAtAsc = 'createdAtAsc'
+  createdAtDesc = 'createdAtDesc'
+  priorityAsc = 'priorityAsc'
+  priorityDesc = 'priorityDesc'
+
 class NewRequest(BaseModel):
   title: str
   description: str | None = None
@@ -38,3 +44,17 @@ class UpdateStatus(BaseModel):
 class RequestsList(TypedDict):
   pages: int
   items: list[RequestData]
+
+class ValidationErrorItem(TypedDict):
+  location: str
+  message: str
+
+class ValidationError(TypedDict):
+  type: str
+  errors: list[ValidationErrorItem]
+
+class QueryFilters(TypedDict):
+  order_by: str
+  order_dir: str
+  where_req: str
+  where_params: list[str]
