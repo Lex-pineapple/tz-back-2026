@@ -1,5 +1,6 @@
 import sqlite3
 from contextlib import contextmanager
+import bcrypt
 
 DB_PATH = "./data/database.db"
 
@@ -38,6 +39,16 @@ def init_db():
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                hashed_password TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute("INSERT OR IGNORE INTO users (username, hashed_password) VALUES (?, ?)", ("admin", bcrypt.hashpw("admin".encode("utf-8"), bcrypt.gensalt()).decode("utf-8")))
         conn.execute("DROP TRIGGER IF EXISTS update_timestamp;")
         conn.execute(update_timestamp_trigger)
         conn.commit()

@@ -45,14 +45,6 @@ class RequestsList(TypedDict):
   pages: int
   items: list[RequestData]
 
-class ValidationErrorItem(TypedDict):
-  location: str
-  message: str
-
-class ValidationError(TypedDict):
-  type: str
-  errors: list[ValidationErrorItem]
-
 class QueryFilters(TypedDict):
   order_by: str
   order_dir: str
