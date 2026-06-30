@@ -1,9 +1,11 @@
 from typing import TypedDict
 
+
 class ValidationErrorItem(TypedDict):
-  location: str
-  message: str
+    location: str
+    message: str
+
 
 class ValidationError(TypedDict):
-  type: str
-  errors: list[ValidationErrorItem]
+    type: str
+    errors: list[ValidationErrorItem]
