@@ -1,5 +1,5 @@
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import TypedDict
 
@@ -24,16 +24,16 @@ class ReqSortEnum(str, Enum):
 
 
 class NewRequest(BaseModel):
-    title: str
-    description: str | None = None
+    title: str = Field(min_length=3, max_length=120)
+    description: str | None = Field(default=None, max_length=1000)
     status: ReqStatusEnum = ReqStatusEnum.new
     priority: ReqModelEnum = ReqModelEnum.low
 
 
 class RequestData(BaseModel):
     id: int | None
-    title: str
-    description: str | None = None
+    title: str = Field(min_length=3, max_length=120)
+    description: str | None = Field(default=None, max_length=1000)
     status: ReqStatusEnum | None
     priority: ReqModelEnum
     created_at: datetime | None

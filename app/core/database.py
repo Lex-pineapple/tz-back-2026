@@ -31,8 +31,8 @@ def init_db():
         conn.execute("""
             CREATE TABLE IF NOT EXISTS test (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
-              title TEXT NOT NULL,
-              description TEXT,
+              title TEXT NOT NULL CHECK (LENGTH(title) >= 3 AND LENGTH(title) <= 120),
+              description TEXT CHECK (LENGTH(description) <= 1000),
               status TEXT NOT NULL CHECK(status IN ('new', 'in_progress', 'done')),
               priority TEXT NOT NULL CHECK(priority IN ('low', 'normal', 'high')),
               created_at TEXT DEFAULT CURRENT_TIMESTAMP,

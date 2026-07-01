@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from app.core.database import init_db
+from app.middlewares.exception_middleware import catch_exceptions_middleware
 from app.middlewares.request_middleware import RequestMiddleware
 from app.requests.router import router as requests_router
 from app.auth.router import router as auth_router
@@ -23,6 +24,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PATCH", "DELETE"],
     allow_headers=["*"],
 )
+app.middleware("http")(catch_exceptions_middleware)
 app.include_router(requests_router)
 app.include_router(auth_router)
 

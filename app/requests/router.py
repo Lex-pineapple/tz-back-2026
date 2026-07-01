@@ -20,13 +20,13 @@ router = APIRouter(
 )
 
 
-@router.post("/")
+@router.post("")
 async def create_request(item: NewRequest) -> DataCreated:
     with get_db() as db:
         cursor = db.cursor()
         cursor.execute(
             "INSERT INTO test (title, description, status, priority) VALUES (?, ?, ?, ?)",
-            (item.title, item.description, "new", item.priority),
+            (item.title, item.description, item.status, item.priority),
         )
         db.commit()
         item_id = cursor.lastrowid
@@ -47,7 +47,7 @@ async def create_request(item: NewRequest) -> DataCreated:
     return DataCreated(id=item_id or 0, message="Request created")
 
 
-@router.get("/")
+@router.get("")
 async def get_all_items(
     status: ReqStatusEnum | None = None,
     priority: ReqModelEnum | None = None,
@@ -91,7 +91,7 @@ async def update_item(request_id: int, body: UpdateStatus):
                     MakeGeneralErrorProps(
                         status=404,
                         error_type="id_not_found",
-                        error_message="User with the id: {id} not found",
+                        error_message=f"User with the id: {id} not found",
                         error_metadata={},
                         message="User not found",
                         isError=True,
@@ -137,7 +137,7 @@ async def delete_request(request_id: int):
                     MakeGeneralErrorProps(
                         status=404,
                         error_type="request_not_found",
-                        error_message="Request with id: {request_id} not found",
+                        error_message=f"Request with id: {request_id} not found",
                         error_metadata={},
                         message="Request not found",
                         isError=True,

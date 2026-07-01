@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    networks:
+      - be
     ports:
       - "8000:8000"
     volumes:
@@ -12,3 +14,7 @@ services:
 
 volumes:
   sqlite_data:
+
+networks:
+  be:
+    driver: bridge

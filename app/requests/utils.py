@@ -27,11 +27,17 @@ def apply_filters(
     sort_fields = {
         "createdAtAsc": ["created_at", "ASC"],
         "createdAtDesc": ["created_at", "DESC"],
-        "priorityAsc": ["priority", "ASC"],
-        "priorityDesc": ["priority", "DESC"],
+        "priorityAsc": [
+            "CASE priority",
+            "WHEN 'low' THEN 1 WHEN 'normal' THEN 2 WHEN 'high' THEN 3 END ASC",
+        ],
+        "priorityDesc": [
+            "CASE priority",
+            "WHEN 'low' THEN 1 WHEN 'normal' THEN 2 WHEN 'high' THEN 3 END DESC",
+        ],
     }
 
-    order_by = sort_fields["createdAtAsc"] if sort else ["created_at", "ASC"]
+    order_by = sort_fields[sort] if sort else ["created_at", "ASC"]
     return {
         "order_by": order_by[0],
         "order_dir": order_by[1],
