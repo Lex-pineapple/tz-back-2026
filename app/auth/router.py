@@ -32,7 +32,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
                     error_message="The password or username are incorrect",
                     error_metadata={},
                     message="Incorrect username or password",
-                    isError=True,
                 )
             ),
             headers={"WWW-Authenticate": "Bearer"},

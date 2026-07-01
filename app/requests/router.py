@@ -40,7 +40,6 @@ async def create_request(item: NewRequest) -> DataCreated:
                     error_message="Request couldn't be created",
                     error_metadata={},
                     message="Request not created",
-                    isError=True,
                 )
             ),
         )
@@ -94,7 +93,6 @@ async def update_item(request_id: int, body: UpdateStatus):
                         error_message=f"User with the id: {id} not found",
                         error_metadata={},
                         message="User not found",
-                        isError=True,
                     )
                 ),
             )
@@ -108,7 +106,6 @@ async def update_item(request_id: int, body: UpdateStatus):
                         error_message='Request with status "done" could not be updated',
                         error_metadata={},
                         message="Can't update request",
-                        isError=True,
                     )
                 ),
             )
@@ -140,7 +137,6 @@ async def delete_request(request_id: int):
                         error_message=f"Request with id: {request_id} not found",
                         error_metadata={},
                         message="Request not found",
-                        isError=True,
                     )
                 ),
             )
@@ -155,7 +151,6 @@ async def delete_request(request_id: int):
                         error_message='Request in status "done" could not be deleted',
                         error_metadata={},
                         message="Request not found",
-                        isError=True,
                     )
                 ),
             )

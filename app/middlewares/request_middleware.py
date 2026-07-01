@@ -4,7 +4,10 @@ from fastapi import Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from app.context import user_id, permissions_var
-from app.utils.make_general_error import MakeGeneralErrorProps, make_general_error
+from app.utils.make_general_error import (
+    MakeGeneralErrorProps,
+    make_general_error_response,
+)
 from app.utils.jwt_verify import verify_token
 from starlette.types import ASGIApp
 
@@ -28,7 +31,7 @@ class RequestMiddleware(BaseHTTPMiddleware):
             auth_header = request.headers.get("Authorization")
 
             if not auth_header or not auth_header.startswith("Bearer "):
-                return make_general_error(
+                return make_general_error_response(
                     MakeGeneralErrorProps(
                         status=401,
                         error_type="missing_auth_token",
@@ -44,7 +47,7 @@ class RequestMiddleware(BaseHTTPMiddleware):
                 id = decoded.get("id")
                 permissions = decoded.get("permissions", [])
                 if not id:
-                    return make_general_error(
+                    return make_general_error_response(
                         MakeGeneralErrorProps(
                             status=401,
                             error_type="invalid_token_payload",
@@ -56,7 +59,7 @@ class RequestMiddleware(BaseHTTPMiddleware):
                 permissions_var.set(permissions)
                 user_id.set(id)
             except Exception as e:
-                return make_general_error(
+                return make_general_error_response(
                     MakeGeneralErrorProps(
                         status=401,
                         error_type="invalid_token",

@@ -3,7 +3,10 @@ from typing import Awaitable, Callable
 
 from fastapi import Request, Response
 
-from app.utils.make_general_error import MakeGeneralErrorProps, make_general_error
+from app.utils.make_general_error import (
+    MakeGeneralErrorProps,
+    make_general_error_response,
+)
 
 
 async def catch_exceptions_middleware(
@@ -13,7 +16,7 @@ async def catch_exceptions_middleware(
         return await call_next(request)
     except Exception as e:
         logging.critical(e, exc_info=True)
-        return make_general_error(
+        return make_general_error_response(
             MakeGeneralErrorProps(
                 status=500,
                 error_type="server_error",

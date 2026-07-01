@@ -28,13 +28,12 @@ class MakeGeneralErrorProps(BaseModel):
     error_type: str
     error_message: str
     error_metadata: Any
-    isError: bool = False
     headers: Mapping[str, str] | None = None
 
 
-def make_general_error(
+def make_general_error_response(
     config: MakeGeneralErrorProps,
-) -> JSONResponse | GeneralErrorWrapper:
+) -> JSONResponse:
     error_detail: GeneralErrorWrapper = {
         "success": False,
         "status": config.status,
@@ -49,6 +48,24 @@ def make_general_error(
         "timestamp": int(time.time()),
     }
 
-    if config.isError:
-        return error_detail
     return JSONResponse(error_detail, status_code=config.status)
+
+
+def make_general_error(
+    config: MakeGeneralErrorProps,
+) -> GeneralErrorWrapper:
+    error_detail: GeneralErrorWrapper = {
+        "success": False,
+        "status": config.status,
+        "data": config.data,
+        "error": {
+            "type": config.error_type,
+            "code": config.status,
+            "message": config.error_message,
+            "metadata": config.error_metadata,
+        },
+        "message": config.message,
+        "timestamp": int(time.time()),
+    }
+
+    return error_detail
