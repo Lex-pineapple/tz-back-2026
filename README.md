@@ -1,4 +1,4 @@
-# Test FAstAPI app
+# Test FastAPI app
 
 Стек: FastAPI + SQLite
 
